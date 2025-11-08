@@ -1,5 +1,8 @@
 package com.example.assessment.controller;
 
+import com.example.assessment.Service.GetNameService;
+import com.example.assessment.model.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,19 +15,15 @@ import java.util.Map;
 @RestController
 @RequestMapping("/hello-world")
 public class GetNameController {
-//this is the controller
+    @Autowired
+    private GetNameService getNameService;
+
     @GetMapping
-    public ResponseEntity<Map<String, String>> GetHello(@RequestParam(required = false) String name) {
-        if (name == null || name.trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "Invalid Input"));
+    public ResponseEntity<Response> getHello(@RequestParam(required = false) String name) {
+        String message = getNameService.GetName(name);
+        if (message == null) {
+            return ResponseEntity.badRequest().body(new Response(null, "Invalid Input"));
         }
-
-        char firstChar = Character.toUpperCase(name.charAt(0));
-        if (firstChar >= 'A' && firstChar <= 'M') {
-            String capitalized = Character.toUpperCase(name.charAt(0)) + name.substring(1);
-            return ResponseEntity.ok(Map.of("message", "Hello " + capitalized));
-        }
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid Input"));
+        return ResponseEntity.ok(new Response(message, null));
     }
 }
